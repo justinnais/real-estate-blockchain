@@ -62,7 +62,7 @@ contract Marketplace {
         address authBy
     );
         
-        // original struct - too many variables
+        // original struct - too many variables for this version of truffle
     // struct LoanApplication {
     //     uint id;
     //     address owner;
