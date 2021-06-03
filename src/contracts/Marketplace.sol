@@ -2,6 +2,8 @@ pragma solidity >0.5.0;
 
 contract Marketplace {
     string public name;
+    // string public Authority;
+    // string public Seller;
 
     uint public permitCount = 0;
     mapping(uint => PermitApplication) public permits;
@@ -60,14 +62,26 @@ contract Marketplace {
         address authBy
     );
         
+        // original struct - too many variables
+    // struct LoanApplication {
+    //     uint id;
+    //     address owner;
+    //     string fullName;
+    //     uint256 birthdate;
+    //     string currentAddress;
+    //     string contactNumber;
+    //     string employerName;
+    //     string annualIncome;
+    //     string applicationProperyAddress;
+    //     string loanAmount;
+    //     applicationStatus status;
+    // }
     struct LoanApplication {
         uint id;
+        address owner;
         string fullName;
-        uint256 birthdate;
-        string contactNumber;
-        string employerName;
         string annualIncome;
-        string propertyAddress;
+        string applicationProperyAddress;
         string loanAmount;
         applicationStatus status;
     }
@@ -75,13 +89,10 @@ contract Marketplace {
 
     event LoanCreated(
         uint id,
+        address owner,
         string fullName,
-        uint256 birthdate,
-        string currentAddress,
-        string contactNumber,
-        string employerName,
         string annualIncome,
-        string propertyAddress,
+        string applicationPropertyAddress,
         string loanAmount,
         applicationStatus status
     );
@@ -143,17 +154,20 @@ contract Marketplace {
         emit PermitStatus(_id, _permit.status, msg.sender);
     }
 
-        function createLoanApplication(string memory _fullName, uint256 _birthdate, string memory _currentAddress, string memory _contactNumber, string memory _employerName, string memory _propertyAddress, string memory _annualIncome,
-                            string memory _loanAmount, applicationStatus _status) public {
-        require(bytes(_propertyAddress).length > 0);
-        require(bytes(_fullName).length > 0);
-        require(bytes(_contactNumber).length > 0);
-        require(bytes(_employerName).length > 0);
-        require(bytes(_loanAmount).length > 0);
-        loanCount++;
+    function createLoanApplication(
+        string memory _fullName,
+        string memory _applicationProperyAddress, 
+        string memory _annualIncome,
+        string memory _loanAmount, 
+        applicationStatus _status) public {
+            
+            require(bytes(_applicationProperyAddress).length > 0);
+            require(bytes(_fullName).length > 0);
+            require(bytes(_loanAmount).length > 0);
 
-        loans[loanCount] = LoanApplication(loanCount, _fullName, _birthdate, _currentAddress, _contactNumber, _employerName, _annualIncome, _propertyAddress, _loanAmount, _status);
-        emit LoanCreated(loanCount, _fullName, _birthdate, _currentAddress, _contactNumber, _employerName, _annualIncome, _propertyAddress, _loanAmount, _status);
+            loanCount++;
+            loans[loanCount] = LoanApplication(loanCount, msg.sender, _fullName, _annualIncome, _applicationProperyAddress, _loanAmount, _status);
+            emit LoanCreated(loanCount, msg.sender, _fullName, _annualIncome, _applicationProperyAddress, _loanAmount, _status);
     }
 
     function updateLoanApplication(uint _id, applicationStatus _status) public {
@@ -164,7 +178,6 @@ contract Marketplace {
         // validate that the status is not the same
         require(_loan.status != _status);
         
-        require(msg.sender == 0x2b0d61c05D8caFF492E1d6a6D3451437801D4b6B);
         _loan.status = _status;
         emit LoanStatus(_id, msg.sender, _status);
     }
