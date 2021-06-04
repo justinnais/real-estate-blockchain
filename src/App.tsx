@@ -191,18 +191,17 @@ export default class App extends Component<Props, State> {
   getAccountType() {
     switch (this.state.account) {
       case Seller:
-        return "Seller"
-    
+        return 'Seller';
+
       case Authority:
-        return "Authority"
-    
+        return 'Authority';
+
       default:
-        return "Not logged in"
+        return 'Not logged in';
     }
   }
 
   render() {
-    
     return (
       <div>
         <NavigationBar account={this.getAccountType()} />

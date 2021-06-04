@@ -77,7 +77,11 @@ export default class Main extends Component<Props, State> {
                       <td>{permit.licenceNumber}</td>
                       <td>{this.getStatus(permit.status) + permit.status}</td>
                       <td>
-                        <Button onClick={() => this.approvePermit(parseInt(permit.id))}>
+                        <Button
+                          onClick={() =>
+                            this.approvePermit(parseInt(permit.id))
+                          }
+                        >
                           Approve
                         </Button>
                       </td>
