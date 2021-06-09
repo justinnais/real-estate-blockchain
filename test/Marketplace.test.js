@@ -51,6 +51,7 @@ contract('Marketplace', ([deployer, seller, authority, buyer, bank]) => {
         { from: seller }
       );
       permitCount = await marketplace.permitCount();
+      console.log('permitCount',permitCount);
     });
 
     // prettier-ignore
@@ -160,9 +161,10 @@ contract('Marketplace', ([deployer, seller, authority, buyer, bank]) => {
         { from: buyer }
       );
       loanCount = await marketplace.loanCount();
+      console.log('loanCount',loanCount);
     });
 
-    it('creates a loan application from a seller', async () => {
+    it('creates a loan application from a buyer', async () => {
       // log event
       const event = result.logs[0].args;
 
@@ -206,15 +208,16 @@ contract('Marketplace', ([deployer, seller, authority, buyer, bank]) => {
     });
     
     // prettier-ignore
-    it('approves loan application from authority', async () => {
-      result = await marketplace.updateLoanApplication(loanCount, 1, { from: authority });
+    it('approves loan application from bank', async () => {
+      result = await marketplace.updateLoanApplication(loanCount, 1, { from: bank });
       // log event
       const event = result.logs[0].args;
-
+      console.log('event', event);
       assert.equal(event.id.toNumber(), loanCount.toNumber(), 'id is correct');
-      assert.equal(event.authBy, authority, 'approved by authority');
+      assert.equal(event.authBy, bank, 'approved by bank');
       assert.equal(event.status.toNumber(), 1, 'Status has been changed to approved');
     });
+
     // prettier-ignore
     it('lists loan application and confirms correct values', async () => {
       const loan = await marketplace.loans(loanCount);
@@ -225,32 +228,32 @@ contract('Marketplace', ([deployer, seller, authority, buyer, bank]) => {
     });
 
     // prettier-ignore
-    it('denies loan application from authority', async () => {
-      result = await marketplace.updateLoanApplication(loanCount, 2, { from: authority });
+    it('denies loan application from bank', async () => {
+      result = await marketplace.updateLoanApplication(loanCount, 2, { from: bank });
       // log event
       const event = result.logs[0].args;
 
       assert.equal(event.id.toNumber(), loanCount.toNumber(), 'id is correct');
-      assert.equal(event.authBy, authority, 'denied by authority');
+      assert.equal(event.authBy, bank, 'denied by bank');
       assert.equal(event.status, 2, 'Status has been changed to denied');
     });
 
     // prettier-ignore 
     it('fails loan application update', async () => {
       // Failure - must have an ID
-      await marketplace.updateLoanApplication('', 1, { from: authority }).should.be.rejected;
+      await marketplace.updateLoanApplication('', 1, { from: bank }).should.be.rejected;
 
       // Failure - must be an ID that exists
-      await marketplace.updateLoanApplication(19211, 1, { from: authority }).should.be.rejected;
+      await marketplace.updateLoanApplication(19211, 1, { from: bank }).should.be.rejected;
 
       // Failure - must change the status
-      await marketplace.updateLoanApplication(loanCount, 0, { from: authority }).should.be.rejected;
+      await marketplace.updateLoanApplication(loanCount, 0, { from: bank }).should.be.rejected;
 
-      // Failure - must not be updated by seller
-      // await marketplace.updateLoanApplication(loanCount, 1, { from: seller }).should.be.rejected;
-
-      // Failure - must be from an auth
+      // Failure - must not be updated by buyer
       await marketplace.updateLoanApplication(loanCount, 1, { from: buyer }).should.be.rejected;
+
+      // Failure - must be from an bank
+      await marketplace.updateLoanApplication(loanCount, 1, { from: authority }).should.be.rejected;
     })
   });
 });
